@@ -2,7 +2,7 @@
 <?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
 <?xml-stylesheet href="main.css" type="text/css"?>
 <dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-title="Download facebook album">
+title="Download facebook album" buttons=",">
 	<dialogheader id="facepaste-title" title="Loading album information..."/>
 	<groupbox id="facepaste-progress-outer">
 		<caption label="Progress"/>
