@@ -61,17 +61,16 @@ Components.utils.import("resource://gre/modules/FileUtils.jsm");
 		NetUtil.asyncCopy(istream, ostream);
 	}
 	function start() {
-		setInterval(poll_add, 1000);
-	}
-	function poll_add() {
-		album.forEach(function(p, pi) {
-			if (p.progress == 'waiting' && in_progress < max_in_progress) {
-				progress(pi, 'preparing');
-				// ajax(p.pageurl, false, 'document', handle_page, pi);
-				ajax(p.pageurl, false, '', handle_page, pi);
-				in_progress++;
-			}
-		});
+		setInterval(function() {
+			album.forEach(function(p, pi) {
+				if (p.progress == 'waiting' && in_progress < max_in_progress) {
+					progress(pi, 'preparing');
+					// ajax(p.pageurl, false, 'document', handle_page, pi);
+					ajax(p.pageurl, false, '', handle_page, pi);
+					in_progress++;
+				}
+			});
+		}, 1000);
 	}
 	function handle_page(res, req, pi) {
 		progress(pi, 'downloading');
