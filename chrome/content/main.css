@@ -1,0 +1,24 @@
+.facepaste-progress {
+	width: 7px;
+	height: 7px;
+	margin: 0px 1px 1px 0px;
+}
+.facepaste-progress-waiting {
+	background: black;
+}
+.facepaste-progress-preparing {
+	background: #606060;
+}
+.facepaste-progress-downloading {
+	background: #ccff99;
+}
+.facepaste-progress-complete {
+	background: #006600;
+}
+#facepaste-progress-outer {
+	padding: 8px;
+	width: 320px;
+}
+#facepaste-progress-legend {
+	padding-bottom: 8px;
+}

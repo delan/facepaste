@@ -1,12 +1,8 @@
 <?xml version="1.0"?>
-<overlay id="facepaste-overlay"
-	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-	<script type="application/x-javascript"
-		src="chrome://facepaste/content/overlay.js" />
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<script src="overlay.js"/>
 	<menupopup id="menu_ToolsPopup">
-		<menuitem id="facepaste-download-item"
-			label="Download this Facebook album"
-			accesskey="k"
-			oncommand="facepaste.download(event);" />
+		<menuitem label="Download this Facebook album" accesskey="k"
+			oncommand="facepaste.download(event);"/>
 	</menupopup>
 </overlay>

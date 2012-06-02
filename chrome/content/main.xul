@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+<?xml-stylesheet href="main.css" type="text/css"?>
+<dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+title="Download facebook album">
+	<dialogheader id="facepaste-title" title="Loading album information..."/>
+	<groupbox id="facepaste-progress-outer">
+		<caption label="Progress"/>
+		<box orient="horizontal" id="facepaste-progress-legend">
+			<box class="facepaste-progress facepaste-progress-waiting"/>
+			<label value="Waiting"/>
+			<box class="facepaste-progress facepaste-progress-preparing"/>
+			<label value="Preparing"/>
+			<box class="facepaste-progress facepaste-progress-downloading"/>
+			<label value="Downloading"/>
+			<box class="facepaste-progress facepaste-progress-complete"/>
+			<label value="Complete"/>
+		</box>
+		<box orient="vertical" id="facepaste-progress-box">
+		</box>
+	</groupbox>
+	<label id="facepaste-status" value="Starting..."/>
+	<script src="main.js"/>
+</dialog>
