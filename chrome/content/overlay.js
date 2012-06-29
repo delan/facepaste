@@ -12,7 +12,11 @@ facepaste.showhide = function(e) {
 	document.getElementById('facepaste-download-menuitem').hidden = !(
 		content.location.hostname == 'www.facebook.com' && (
 			/^\/[A-Za-z0-9.]+\/photos$/.test(content.location.pathname) ||
-			content.location.pathname == '/media/set/'
+			content.location.pathname == '/media/set/' ||
+			(
+				content.location.pathname == '/profile.php' &&
+				/(\?|&)sk=photos(&|$)/.test(content.location.search)
+			)
 		));
 };
 
