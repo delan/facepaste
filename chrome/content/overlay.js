@@ -9,7 +9,7 @@ facepaste.download = function(e) {
 };
 
 facepaste.showhide = function(e) {
-	document.getElementById('facepaste_download_menuitem').hidden = !(
+	document.getElementById('facepaste-download-menuitem').hidden = !(
 		content.location.hostname == 'www.facebook.com' && (
 			/^\/[A-Za-z0-9.]+\/photos$/.test(content.location.pathname) ||
 			content.location.pathname == '/media/set/'
