@@ -20,5 +20,8 @@ title="Download facebook album" buttons=",">
 		</box>
 	</groupbox>
 	<label id="facepaste-status" value="Starting..."/>
+	<box orient="horizontal">
+		<button id="facepaste-closecancel" label="Cancel" oncommand="close();"/>
+	</box>
 	<script src="main.js"/>
 </dialog>

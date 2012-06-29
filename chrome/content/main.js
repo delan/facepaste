@@ -75,8 +75,12 @@ Components.utils.import("resource://gre/modules/FileUtils.jsm");
 				}
 			});
 			if (done_in_this_round == album.length)
-				clearInterval(poll_interval);
+				all_done();
 		}, 1000);
+	}
+	function all_done() {
+		clearInterval(poll_interval);
+		document.getElementById('facepaste-closecancel').label = 'Close';
 	}
 	function handle_page(res, req, pi) {
 		progress(pi, 'downloading');
