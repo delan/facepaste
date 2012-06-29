@@ -2,7 +2,8 @@
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	<script src="overlay.js"/>
 	<popup id="contentAreaContextMenu">
-		<menuitem label="Download this Facebook album" accesskey="k"
+		<menuitem id="facepaste_download_menuitem"
+			label="Download this Facebook album" accesskey="k"
 			oncommand="facepaste.download(event);"/>
 	</popup>
 </overlay>

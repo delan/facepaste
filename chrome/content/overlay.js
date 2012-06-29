@@ -7,3 +7,22 @@ facepaste.download = function(e) {
 			content: content
 		});
 };
+
+facepaste.showhide = function(e) {
+	document.getElementById('facepaste_download_menuitem').hidden = !(
+		content.location.hostname == 'www.facebook.com' && (
+			/^\/[A-Za-z0-9.]+\/photos$/.test(content.location.pathname) ||
+			content.location.pathname == '/media/set/'
+		));
+};
+
+/*
+	very weird; without waiting for the load event, calling d.gEBI('cACM') will
+	mysteriously perma-hide all custom menu entries from any add-on, with no
+	errors
+*/
+
+addEventListener('load', function(e) {
+	document.getElementById('contentAreaContextMenu').
+		addEventListener('popupshowing', facepaste.showhide, false);
+}, false);
