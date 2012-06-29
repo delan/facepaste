@@ -15,6 +15,7 @@ Components.utils.import("resource://gre/modules/FileUtils.jsm");
 	var in_progress = 0; // number of active images
 	var num_done = 0; // number of completed images
 	var output_directory; // nsIFile with the output directory
+	var poll_interval; // setInterval timer ID
 	function _(array_like) {
 		return Array.prototype.slice.call(array_like);
 	}
@@ -61,15 +62,20 @@ Components.utils.import("resource://gre/modules/FileUtils.jsm");
 		NetUtil.asyncCopy(istream, ostream);
 	}
 	function start() {
-		setInterval(function() {
+		poll_interval = setInterval(function() {
+			var done_in_this_round = 0;
 			album.forEach(function(p, pi) {
 				if (p.progress == 'waiting' && in_progress < max_in_progress) {
 					progress(pi, 'preparing');
 					// ajax(p.pageurl, false, 'document', handle_page, pi);
 					ajax(p.pageurl, false, '', handle_page, pi);
 					in_progress++;
+				} else if (p.progress == 'complete') {
+					done_in_this_round++;
 				}
 			});
+			if (done_in_this_round == album.length)
+				clearInterval(poll_interval);
 		}, 1000);
 	}
 	function handle_page(res, req, pi) {
