@@ -91,7 +91,8 @@ Components.utils.import("resource://gre/modules/FileUtils.jsm");
 	}
 	function handle_image(res, req, pi) {
 		progress(pi, 'complete');
-		write_file(album[pi].imageurl.match(/([^\/]+)\?/)[1], res);
+		// prefix filename with id+1 (so first picture is #1) for easy sorting
+		write_file((pi + 1) + " - " + album[pi].imageurl.match(/([^\/]+)\?/)[1], res);
 		in_progress--;
 		num_done++;
 		log('Downloaded ' + num_done + ' of ' + album.length + ' images');
