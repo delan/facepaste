@@ -16,6 +16,7 @@ Components.utils.import("resource://gre/modules/FileUtils.jsm");
 	var num_done = 0; // number of completed images
 	var output_directory; // nsIFile with the output directory
 	var poll_interval; // setInterval timer ID
+	var zero_pad_string; // string to pad photo numbers with zeros
 	function _(array_like) {
 		return Array.prototype.slice.call(array_like);
 	}
@@ -92,7 +93,9 @@ Components.utils.import("resource://gre/modules/FileUtils.jsm");
 	function handle_image(res, req, pi) {
 		progress(pi, 'complete');
 		// prefix filename with id+1 (so first picture is #1) for easy sorting
-		write_file((pi + 1) + " - " + album[pi].imageurl.match(/([^\/]+)\?/)[1], res);
+		write_file(
+			(zero_pad_string + (pi + 1)).slice(-zero_pad_string.length) +
+			" - " + album[pi].imageurl.match(/([^\/]+)\?/)[1], res);
 		in_progress--;
 		num_done++;
 		log('Downloaded ' + num_done + ' of ' + album.length + ' images');
@@ -115,6 +118,7 @@ Components.utils.import("resource://gre/modules/FileUtils.jsm");
 		in_last_progress_row++;
 		return { pageurl: l.href, progress: 'waiting' };
 	});
+	zero_pad_string = Array(1 + String(album.length).length).join('0');
 	output_directory = choose_directory();
 	if (output_directory)
 		start();
