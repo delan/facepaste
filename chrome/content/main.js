@@ -92,10 +92,10 @@ Components.utils.import("resource://gre/modules/FileUtils.jsm");
 	}
 	function handle_image(res, req, pi) {
 		progress(pi, 'complete');
-		// prefix filename with id+1 (so first picture is #1) for easy sorting
+		// name photos according to their order in the album for easy sorting
 		write_file(
 			(zero_pad_string + (pi + 1)).slice(-zero_pad_string.length) +
-			" - " + album[pi].imageurl.match(/([^\/]+)\?/)[1], res);
+			'.jpg', res); // at the moment, Facebook photos are always JPEG
 		in_progress--;
 		num_done++;
 		log('Downloaded ' + num_done + ' of ' + album.length + ' images');
