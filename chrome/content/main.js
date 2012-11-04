@@ -102,7 +102,8 @@ Components.utils.import("resource://gre/modules/FileUtils.jsm");
 	}
 	d.querySelector('#facepaste-title').setAttribute('title',
 		cd.querySelector('title').textContent);
-	album = _(cd.querySelectorAll('a.uiMediaThumb:not(.uiMediaThumbAlb)')).
+	album = _(cd.querySelectorAll(
+		'a.uiMediaThumb:not(.uiMediaThumbAlb):not(.albumThumbLink)')).
 		map(function(l) {
 		if (in_last_progress_row == max_progress_row) {
 			last_progress_row = d.createElement('box');
