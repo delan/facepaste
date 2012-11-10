@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+<?xml-stylesheet href="facepaste.css" type="text/css"?>
+<window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+title="Download facebook albums with facepaste">
+	<vbox>
+		<vbox id="lobby">
+			<box>
+				<groupbox id="albums_group">
+					<caption label="Albums"/>
+					<label value="(ctrl/command-click for multiple)"/>
+					<listbox id="albums" rows="6" seltype="multiple">
+						<!--
+							<listitem label="Album name"/>
+							<listitem label="Album name"/>
+							<listitem label="Album name"/> ...
+						-->
+					</listbox>
+				</groupbox>
+				<groupbox>
+					<caption label="Options"/>
+					<label value="Save photos to"/>
+					<box>
+						<textbox id="path" readonly="true"/>
+						<button id="browse" label="?"/>
+					</box>
+					<label value="Output file naming"/>
+					<radiogroup id="naming">
+						<radio label="Numbered in order"/>
+						<radio label="Unique Facebook ID"/>
+						<radio label="Both numbers and IDs"/>
+					</radiogroup>
+				</groupbox>
+			</box>
+			<box align="right">
+				<button id="start" label="Start" disabled="true"/>
+				<button id="cancel" label="Cancel"/>
+			</box>
+		</vbox>
+		<vbox id="engine" hidden="true">
+			<browser type="content"/>
+			<textbox id="log" multiline="true" readonly="true"/>
+			<groupbox>
+				<caption label="Progress legend"/>
+				<box id="legend">
+					<box class="waiting"/>
+					<label value="Waiting"/>
+					<box class="preparing"/>
+					<label value="Preparing"/>
+					<box class="downloading"/>
+					<label value="Downloading"/>
+					<box class="complete"/>
+					<label value="Complete"/>
+					<box class="error"/>
+					<label value="Error"/>
+				</box>
+			</groupbox>
+			<box id="progress_outer">
+				<groupbox id="progress_albums">
+					<caption label="Album progress"/>
+				</groupbox>
+				<groupbox id="progress_photos">
+					<caption label="Photo progress"/>
+				</groupbox>
+			</box>
+			<box align="right">
+				<button id="cancelrunning" label="Cancel"/>
+			</box>
+		</vbox>
+	</vbox>
+	<script src="facepaste.js"/>
+</window>

@@ -1,0 +1,41 @@
+window {
+	padding: 8px;
+}
+#log {
+	width: 640px;
+	height: 240px;
+}
+#progress_albums {
+	width: 200px;
+}
+#progress_photos {
+	width: 440px;
+}
+#progress_outer > groupbox, #legend {
+	padding: 8px;
+}
+#progress_outer > groupbox > box > box {
+	width: 7px;
+	height: 7px;
+	margin: 0px 1px 1px 0px;
+}
+#legend box {
+	width: 14px;
+	height: 14px;
+	margin: 1px;
+}
+.waiting {
+	background: black;
+}
+.preparing {
+	background: #606060;
+}
+.downloading {
+	background: #ccff99;
+}
+.complete {
+	background: #006600;
+}
+.error {
+	background: #880000;
+}
