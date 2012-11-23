@@ -402,13 +402,26 @@ function get_photo(p) {
 
 function handle_photo_page(p, r) {
 	p.log('successfully received photo page, creating photo file');
-	p.photourl = _(r.response.querySelectorAll('a')).filter(function(x) {
-		return (x.rel == 'ignore') &&
-			(x.className == 'fbPhotosPhotoActionsItem');
-	})[0].href;
+	var download_link = _(r.response.querySelectorAll('a')).filter(
+		function(x) {
+			return (x.rel == 'ignore') &&
+				(x.className == 'fbPhotosPhotoActionsItem');
+		})[0];
+	var image_element = r.response.querySelector('.fbPhotoImage');
+	if (!download_link && !image_element) {
+		p.log(
+			'error: no download link or photo found on photo page, ' +
+			'are you accepting third party cookies?'
+		);
+		p.set_status('error');
+		Pa--;
+		Pd++;
+	}
+	// fall back to the img's src when no download link given, e.g. cover photos
+	p.photourl = download_link ? download_link.href : image_element.src;
 	p.set_status('downloading');
 	p.outfile = p.album.outdir.clone();
-	var orig_name = p.photourl.match(/\/([^\/]+)\?dl=1/)[1];
+	var orig_name = p.photourl.match(/\/([^\/]+.jpg)(?:\?dl=1)?/)[1];
 	switch (O.naming) {
 	case 0:
 		p.outfile.append(sanitise_fn(padded_number(p) + '.jpg'));
