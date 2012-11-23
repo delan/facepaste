@@ -177,6 +177,14 @@ function Photo() {
 	this.set_status = function(status) {
 		this.status = status;
 		this.dot.className = status;
+		this.update_tooltip();
+	};
+	this.update_tooltip = function() {
+		this.dot.setAttribute('tooltiptext',
+			'Album ' + this.album.number + ': ' + this.album.name + '\n' +
+			'Photo ' + this.number + ' of ' + this.album.photos.length + '\n' +
+			'URL: ' + (this.photourl || 'not yet known')
+		);
 	};
 	this.log = function(message) {
 		log('(album ' + this.album.number +
@@ -358,6 +366,7 @@ function handle_album_index(a, ai) {
 			p.pageurl = x.href;
 			p.number = a.photos.length + 1;
 			p.album = a;
+			p.update_tooltip();
 			P.push(p);
 			a.photos.push(p);
 		});
