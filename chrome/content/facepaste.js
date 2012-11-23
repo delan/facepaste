@@ -240,9 +240,17 @@ function get_available_albums() {
 	var list = $$('#albums');
 	if (O.type == 'user_albums') {
 		$c('li:not(.fbPhotosRedesignNavSelected) .fbPhotosRedesignNavContent').
-			map(function(x, i) {
+			map(function(x, i, links) {
 			var a = new Album;
-			a.name = (i ? 'Photos by ' : 'Photos of ') + get_user_name();
+			// if the target user is a friend, the links will be:
+			//     photos of | photos by
+			// if the target user is not a friend, the links will be:
+			//     photos by
+			if (links.length == 1 || i == 1)
+				var prefix = 'Photos by ';
+			else
+				var prefix = 'Photos of ';
+			a.name = prefix + get_user_name();
 			a.url = x.href;
 			A.push(a);
 			return a.name;
