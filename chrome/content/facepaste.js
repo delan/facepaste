@@ -366,10 +366,12 @@ function handle_album_index(a, ai) {
 			p.pageurl = x.href;
 			p.number = a.photos.length + 1;
 			p.album = a;
-			p.update_tooltip();
 			P.push(p);
 			a.photos.push(p);
 		});
+	a.photos.forEach(function(p) {
+		p.update_tooltip();
+	});
 	a.set_status('complete');
 	Ad++;
 	if (A[ai + 1])
