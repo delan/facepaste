@@ -233,7 +233,7 @@ function get_user_name() {
 function get_page_description() {
 	switch (O.type) {
 	case 'album':
-		return get_user_name() + ': ' + $$c('.fbPhotoAlbumTitle').textContent;
+		return get_user_name() + ' - ' + $$c('.fbPhotoAlbumTitle').textContent;
 	case 'user_photos_of':
 		return 'Photos of ' + get_user_name();
 	case 'user_photos':
