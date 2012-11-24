@@ -196,6 +196,7 @@ function Photo() {
 	this.photourl = '';
 	this.album = null;
 	this.number = 0;
+	this.video = false;
 	this.status = 'waiting';
 	this.dot = new_progress_dot(false);
 	this.set_status = function(status) {
@@ -408,12 +409,14 @@ function handle_album_index(a, ai) {
 	a.log('parsing album index');
 	var bcd = browser.contentDocument;
 	var photo_page_links = _(bcd.querySelectorAll(
-		'a.uiMediaThumb:not(.uiMediaThumbAlb):not(.albumThumbLink)'));
+		'a.uiMediaThumb:not(.uiMediaThumbAlb):not(.albumThumbLink)' +
+		', a.uiVideoLink'));
 	a.log('found ' + photo_page_links.length + ' photos');
 	photo_page_links.forEach(function(x) {
 			var p = new Photo;
 			p.pageurl = x.href;
 			p.number = a.photos.length + 1;
+			p.video = x.classList.contains('uiVideoLink');
 			p.album = a;
 			P.push(p);
 			a.photos.push(p);
@@ -451,29 +454,40 @@ function get_photo(p) {
 
 function handle_photo_page(p, r) {
 	p.log('successfully received photo page, creating photo file');
-	var download_link = _(r.response.querySelectorAll('a')).filter(
-		function(x) {
-			return (x.rel == 'ignore') &&
-				(x.className == 'fbPhotosPhotoActionsItem');
-		})[0];
-	var image_element = r.response.querySelector('.fbPhotoImage');
-	if (!download_link && !image_element) {
-		p.log(
-			'error: no download link or photo found on photo page, ' +
-			'are you accepting third party cookies?'
-		);
-		p.set_status('error');
-		Pa--;
-		Pd++;
+	if (p.video) {
+		var hqmatch = r.response.body.innerHTML.match(
+			/\["highqual_src",("[^"]+")\]/);
+		var match = r.response.body.innerHTML.match(
+			/\["video_src",("[^"]+")\]/);
+			p.photourl = decodeURIComponent(JSON.parse(
+				(hqmatch || match)[1]));
+	} else {
+		var download_link = _(r.response.querySelectorAll('a')).filter(
+			function(x) {
+				return (x.rel == 'ignore') &&
+					(x.className == 'fbPhotosPhotoActionsItem');
+			})[0];
+		var image_element = r.response.querySelector('.fbPhotoImage');
+		if (!download_link && !image_element) {
+			p.log(
+				'error: no download link or photo found on photo page, ' +
+				'are you accepting third party cookies?'
+			);
+			p.set_status('error');
+			Pa--;
+			Pd++;
+		}
+		// fall back to img's src when no download link given, e.g. cover photos
+		p.photourl = download_link ? download_link.href : image_element.src;
 	}
-	// fall back to the img's src when no download link given, e.g. cover photos
-	p.photourl = download_link ? download_link.href : image_element.src;
 	p.set_status('downloading');
 	p.outfile = p.album.outdir.clone();
-	var orig_name = p.photourl.match(/\/([^\/]+.jpg)(?:\?dl=1)?/)[1];
+	var orig_name = p.photourl.match(/\/([^\/?]+)(?:\?.*)?$/)[1];
 	switch (O.naming) {
 	case 0:
-		p.outfile.append(sanitise_fn(padded_number(p) + '.jpg'));
+		// as of current knowledge, all videos are .mp4 and all photos are .jpg
+		p.outfile.append(sanitise_fn(padded_number(p) +
+			(p.video ? '.mp4' : '.jpg')));
 		break;
 	case 1:
 		p.outfile.append(sanitise_fn(orig_name));
