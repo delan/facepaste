@@ -311,10 +311,6 @@ function get_available_albums() {
 			item.setAttribute('label', x);
 			list.appendChild(item);
 		});
-		$$('#loading_msg').hidden = true;
-		album_list_available = true;
-		start_enable();
-		sizeToContent();
 	} else {
 		var a = new Album;
 		a.name = get_page_description();
@@ -324,6 +320,10 @@ function get_available_albums() {
 		item.setAttribute('label', a.name);
 		list.appendChild(item);
 	}
+	$$('#loading_msg').hidden = true;
+	album_list_available = true;
+	start_enable();
+	sizeToContent();
 }
 
 function get_selected_albums() {
