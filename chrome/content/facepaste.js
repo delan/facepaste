@@ -66,7 +66,7 @@ function sanitise_fn(name) {
 	return name.
 		replace(/[<>:"\/\\|?*\u0000-\u001f]/g, '_').
 		replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/,'_$1').
-		replace(/\.$|^\./, '');
+		replace(/\.+$|^\.+/g, '');
 }
 
 function padded_number(p) {
