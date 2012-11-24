@@ -5,6 +5,7 @@
 title="Download facebook albums with facepaste">
 	<vbox>
 		<vbox id="lobby">
+			<label id="loading_msg" value="Loading list of albums..."/>
 			<box>
 				<groupbox id="albums_group">
 					<caption label="Albums"/>
@@ -38,7 +39,6 @@ title="Download facebook albums with facepaste">
 			</box>
 		</vbox>
 		<vbox id="engine" hidden="true">
-			<browser type="content"/>
 			<textbox id="log" multiline="true" readonly="true"/>
 			<groupbox>
 				<caption label="Progress legend"/>

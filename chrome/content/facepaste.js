@@ -9,12 +9,13 @@ var D = C.document;
 var A = [], P = [];
 var Ad = 0, Pd = 0, Pa = 0;
 
-var browser = document.querySelector('browser');
+var browser;
 var outdir;
 var progress_line_albums;
 var progress_line_albums_used = 25;
 var progress_line_photos;
 var progress_line_photos_used = 50;
+var album_list_available = false;
 
 /* utils */
 
@@ -35,12 +36,20 @@ function $c(elsel) {
 	return $q(D, elsel);
 }
 
+function $b(elsel) {
+	return $q(browser.contentDocument, elsel);
+}
+
 function $$(elsel) {
 	return $(elsel)[0];
 }
 
 function $$c(elsel) {
 	return $c(elsel)[0];
+}
+
+function $$b(elsel) {
+	return $b(elsel)[0];
 }
 
 function E(selector, event, func) {
@@ -104,10 +113,25 @@ function ajax(url, rtype, success, failure) {
 	r.send(null);
 }
 
+function new_browser() {
+	if (browser)
+		browser.parentNode.removeChild(browser);
+	browser = document.createElementNS(
+		'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
+		'browser');
+	browser.setAttribute('type', 'content');
+	document.documentElement.appendChild(browser);
+}
+
 /* main actions */
 
 function init() {
-	get_available_albums();
+	if (O.type == 'user_albums')
+		// autoscroll the albums page before calling get_available_albums
+		fetch_album_list();
+	else
+		// call get_available_albums directly as current page is an album
+		get_available_albums();
 	E('#albums', 'select', start_enable);
 	E('#browse', 'command', browse);
 	E('#start', 'command', start);
@@ -223,7 +247,8 @@ function new_progress_dot(is_album) {
 }
 
 function start_enable() {
-	$$('#start').disabled = !(outdir && $$('#albums').selectedCount);
+	$$('#start').disabled = !(album_list_available &&
+		outdir && $$('#albums').selectedCount);
 }
 
 function get_user_name() {
@@ -244,10 +269,17 @@ function get_page_description() {
 	return 'Unknown';
 }
 
+function fetch_album_list() {
+	new_browser();
+	E(browser, 'DOMContentLoaded', begin_scrolling.bind(
+		global, get_available_albums));
+	browser.loadURI(C.location.toString());
+}
+
 function get_available_albums() {
 	var list = $$('#albums');
 	if (O.type == 'user_albums') {
-		$c('li:not(.fbPhotosRedesignNavSelected) .fbPhotosRedesignNavContent').
+		$b('li:not(.fbPhotosRedesignNavSelected) .fbPhotosRedesignNavContent').
 			map(function(x, i, links) {
 			var a = new Album;
 			// if the target user is a friend, the links will be:
@@ -267,7 +299,7 @@ function get_available_albums() {
 			item.setAttribute('label', x);
 			list.appendChild(item);
 		});
-		$c('.albumThumbLink').map(function(x) {
+		$b('.albumThumbLink').map(function(x) {
 			var a = new Album;
 			a.name = x.parentNode.querySelector(
 				'.photoTextTitle strong').textContent;
@@ -279,6 +311,10 @@ function get_available_albums() {
 			item.setAttribute('label', x);
 			list.appendChild(item);
 		});
+		$$('#loading_msg').hidden = true;
+		album_list_available = true;
+		start_enable();
+		sizeToContent();
 	} else {
 		var a = new Album;
 		a.name = get_page_description();
@@ -333,16 +369,28 @@ function start_album(i) {
 		return;
 	}
 	a.log('fetching album index');
-	a.dcl = begin_scrolling.bind(global, a, i);
-	E(browser, 'DOMContentLoaded', a.dcl);
+	new_browser();
+	E(browser, 'DOMContentLoaded', begin_scrolling.bind(
+		global, handle_album_index.bind(global, a, i)));
 	browser.loadURI(a.url);
 }
 
-function begin_scrolling(a, ai) {
-	a.log('scrolling album index');
+function begin_scrolling(callback, event) {
+	if (event.target instanceof Ci.nsIDOMHTMLDocument &&
+		event.target != browser.contentDocument)
+		return; // only continue for the main document, not any frames
 	var x = 0, y = 0;
-	ER(browser, 'DOMContentLoaded', a.dcl);
-	delete a.dcl;
+	/*
+		OLD SOLUTION (doesn't appear to work at all):
+		
+		// although argumetns.callee is deprecated, we need it here because the
+		// current function is never actually the original begin_scrolling, but
+		// a bound function with a supplied callback argument
+		ER(browser, 'DOMContentLoaded', arguments.callee);
+		
+		NEW SOLUTION: delete and create a new browser element = no listeners
+		see: new_browser calls in start_album and fetch_album_list
+	*/
 	var bcw = browser.contentWindow;
 	E(bcw, 'scroll', function() { y++; });
 	var t = bcw.setInterval(function() {
@@ -350,7 +398,8 @@ function begin_scrolling(a, ai) {
 		bcw.scrollBy(0, 50);
 		if (x > y + 50) {
 			bcw.clearInterval(t);
-			handle_album_index(a, ai);
+			if (callback)
+				callback();
 		}
 	}, 100);
 }

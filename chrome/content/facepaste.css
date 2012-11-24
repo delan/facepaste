@@ -24,6 +24,10 @@ window {
 	height: 14px;
 	margin: 1px;
 }
+#loading_msg {
+	font-weight: bold;
+	padding: 0.5em 0;
+}
 .waiting {
 	background: black;
 }
