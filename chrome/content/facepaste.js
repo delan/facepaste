@@ -552,6 +552,6 @@ function handle_photo_error(p, chan) {
 	Pd++;
 }
 
-init();
+E(global, 'load', init);
 
 })(this);
