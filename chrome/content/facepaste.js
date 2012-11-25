@@ -11,10 +11,9 @@ var Ad = 0, Pd = 0, Pa = 0;
 
 var browser;
 var outdir;
-var progress_line_albums;
-var progress_line_albums_used = 25;
-var progress_line_photos;
-var progress_line_photos_used = 50;
+var progress_lines = [];
+var progress_lines_used = [50, 25];
+var progress_lines_max = [50, 25];
 var album_list_available = false;
 
 /* utils */
@@ -71,10 +70,15 @@ function ER(selector, event, func) {
 }
 
 function sanitise_fn(name) {
-	// msdn.microsoft.com/en-us/library/windows/desktop/aa365247%28v=vs.85%29
+	// windows is the most restrictive with file names, to make the logic
+	// a little simpler we'll use windows' rules for everyone as per:
+	// msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85)
 	return name.
+		// no C0 control codes or characters in <>:"/\|?*
 		replace(/[<>:"\/\\|?*\u0000-\u001f]/g, '_').
+		// no file names that are entirely reserved DOS device names
 		replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/,'_$1').
+		// no trailing or leading dots
 		replace(/\.+$|^\.+/g, '');
 }
 
@@ -90,6 +94,8 @@ function padded_number(p) {
 function log(message) {
 	var x = $$('#log');
 	x.value += message + '\n';
+	// TODO: need a solution that looks better; setting value scrolls to the
+	// top, which when followed by scrolling to the bottom causes flickering
 	x.selectionStart = x.value.length;
 	x.selectionEnd = x.value.length;
 }
@@ -127,10 +133,10 @@ function new_browser() {
 
 function init() {
 	if (O.type == 'user_albums')
-		// autoscroll the albums page before calling get_available_albums
+		// autoscroll albums page before calling get_available_albums
 		fetch_album_list();
 	else
-		// call get_available_albums directly as current page is an album
+		// call get_available_albums directly; current page is an album
 		get_available_albums();
 	E('#albums', 'select', start_enable);
 	E('#browse', 'command', browse);
@@ -140,7 +146,8 @@ function init() {
 }
 
 function browse() {
-	var p = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
+	var p = Cc["@mozilla.org/filepicker;1"].
+		createInstance(Ci.nsIFilePicker);
 	p.init(window, 'Choose a directory to download photos to',
 		Ci.nsIFilePicker.modeGetFolder);
 	if (p.show() == Ci.nsIFilePicker.returnOK) {
@@ -152,7 +159,9 @@ function browse() {
 
 function start() {
 	O.naming = $$('#naming').selectedIndex;
-	get_selected_albums(); // MUST do this before hiding the lobby
+	// get_selected_albums MUST be called before hiding the lobby because
+	// when a XUL listbox is hidden, its selection state is destroyed
+	get_selected_albums();
 	$$('#lobby').hidden = true;
 	$$('#engine').hidden = false;
 	sizeToContent();
@@ -173,7 +182,6 @@ function cancel() {
 /* object structures */
 
 function Album() {
-	/* waiting, preparing, downloading, complete, error */
 	this.name = '';
 	this.url = '';
 	this.outdir = null;
@@ -191,7 +199,6 @@ function Album() {
 }
 
 function Photo() {
-	/* waiting, preparing, downloading, complete, error */
 	this.pageurl = '';
 	this.photourl = '';
 	this.album = null;
@@ -206,8 +213,10 @@ function Photo() {
 	};
 	this.update_tooltip = function() {
 		this.dot.setAttribute('tooltiptext',
-			'Album ' + this.album.number + ': ' + this.album.name + '\n' +
-			'Photo ' + this.number + ' of ' + this.album.photos.length + '\n' +
+			'Album ' + this.album.number + ': ' +
+				this.album.name + '\n' +
+			'Photo ' + this.number + ' of ' +
+				this.album.photos.length + '\n' +
 			'URL: ' + (this.photourl || 'not yet known')
 		);
 	};
@@ -220,36 +229,24 @@ function Photo() {
 /* behind the scenes */
 
 function new_progress_dot(is_album) {
-	if (is_album) {
-		if (progress_line_albums_used == 25) {
-			progress_line_albums = document.createElement('box');
-			$$('#progress_albums').appendChild(progress_line_albums);
-			sizeToContent();
-			progress_line_albums_used = 0;
-		}
-		var dot = document.createElement('box');
-		dot.className = 'waiting';
-		progress_line_albums.appendChild(dot);
-		progress_line_albums_used++;
-		return dot;
-	} else {
-		if (progress_line_photos_used == 50) {
-			progress_line_photos = document.createElement('box');
-			$$('#progress_photos').appendChild(progress_line_photos);
-			sizeToContent();
-			progress_line_photos_used = 0;
-		}
-		var dot = document.createElement('box');
-		dot.className = 'waiting';
-		progress_line_photos.appendChild(dot);
-		progress_line_photos_used++;
-		return dot;
+	var i = Number(is_album);
+	if (progress_lines_used[i] == progress_lines_max[i]) {
+		progress_lines[i] = document.createElement('box');
+		$$('#progress_' + ['photos', 'albums'][i]).appendChild(
+			progress_lines[i]);
+		sizeToContent();
+		progress_lines_used[i] = 0;
 	}
+	var dot = document.createElement('box');
+	dot.className = 'waiting';
+	progress_lines[i].appendChild(dot);
+	progress_lines_used[i]++;
+	return dot;
 }
 
 function start_enable() {
-	$$('#start').disabled = !(album_list_available &&
-		outdir && $$('#albums').selectedCount);
+	$$('#start').disabled = !(album_list_available && outdir &&
+		$$('#albums').selectedCount);
 }
 
 function get_user_name() {
@@ -259,7 +256,8 @@ function get_user_name() {
 function get_page_description() {
 	switch (O.type) {
 	case 'album':
-		return get_user_name() + ' - ' + $$c('.fbPhotoAlbumTitle').textContent;
+		return get_user_name() + ' - ' +
+			$$c('.fbPhotoAlbumTitle').textContent;
 	case 'user_photos_of':
 		return 'Photos of ' + get_user_name();
 	case 'user_photos':
@@ -280,13 +278,14 @@ function fetch_album_list() {
 function get_available_albums() {
 	var list = $$('#albums');
 	if (O.type == 'user_albums') {
-		$b('li:not(.fbPhotosRedesignNavSelected) .fbPhotosRedesignNavContent').
+		$b('li:not(.fbPhotosRedesignNavSelected) ' +
+			'.fbPhotosRedesignNavContent').
 			map(function(x, i, links) {
 			var a = new Album;
-			// if the target user is a friend, the links will be:
-			//     photos of | photos by
-			// if the target user is not a friend, the links will be:
-			//     photos by
+			// if the target user is a friend, most likely will be:
+			// [photos of] | [photos by]
+			// if the target user is not a friend, links will be:
+			// [photos by]
 			if (links.length == 1 || i == 1)
 				var prefix = 'Photos by ';
 			else
@@ -351,13 +350,13 @@ function start_album(i) {
 	} catch (e) {
 		switch (e.result) {
 		case Cr.NS_ERROR_FILE_NOT_FOUND:
-			a.log('error creating album folder: path would be too long');
+			a.log('error creating album folder: path too long');
 			break;
 		case Cr.NS_ERROR_FILE_ACCESS_DENIED:
 			a.log('error creating album folder: access denied');
 			break;
 		case Cr.NS_ERROR_FILE_ALREADY_EXISTS:
-			a.log('error creating album folder: folder already exists');
+			a.log('error creating album folder: folder exists');
 			break;
 		default:
 			a.log('error creating album folder: ' + e.message);
@@ -379,19 +378,12 @@ function start_album(i) {
 function begin_scrolling(callback, event) {
 	if (event.target instanceof Ci.nsIDOMHTMLDocument &&
 		event.target != browser.contentDocument)
-		return; // only continue for the main document, not any frames
+		return; // run once for the main document, not for frames too
 	var x = 0, y = 0;
-	/*
-		OLD SOLUTION (doesn't appear to work at all):
-		
-		// although argumetns.callee is deprecated, we need it here because the
-		// current function is never actually the original begin_scrolling, but
-		// a bound function with a supplied callback argument
-		ER(browser, 'DOMContentLoaded', arguments.callee);
-		
-		NEW SOLUTION: delete and create a new browser element = no listeners
-		see: new_browser calls in start_album and fetch_album_list
-	*/
+	// we previously removed the listener that triggered this function here,
+	// but even when using the theoretically perfect arguments.callee, the
+	// listener never seemed to remove properly, so we now just delete and
+	// recreate a new browser element each use
 	var bcw = browser.contentWindow;
 	E(bcw, 'scroll', function() { y++; });
 	var t = bcw.setInterval(function() {
@@ -436,10 +428,14 @@ function queue_poll() {
 		$$('#cancelrunning').setAttribute('label', 'Close');
 		return;
 	}
-	var waiting = P.filter(function(x) { return x.status == 'waiting'; });
+	var waiting = P.filter(function(x) {
+		return x.status == 'waiting';
+	});
 	while (Pa < 8 && waiting.length) {
 		get_photo(waiting[0]);
-		waiting = P.filter(function(x) { return x.status == 'waiting'; });
+		waiting = P.filter(function(x) {
+			return x.status == 'waiting';
+		});
 	}
 	setTimeout(queue_poll, 500);
 }
@@ -462,30 +458,33 @@ function handle_photo_page(p, r) {
 			p.photourl = decodeURIComponent(JSON.parse(
 				(hqmatch || match)[1]));
 	} else {
-		var download_link = _(r.response.querySelectorAll('a')).filter(
+		var link = _(r.response.querySelectorAll('a')).filter(
 			function(x) {
 				return (x.rel == 'ignore') &&
-					(x.className == 'fbPhotosPhotoActionsItem');
+					(x.className ==
+						'fbPhotosPhotoActionsItem');
 			})[0];
-		var image_element = r.response.querySelector('.fbPhotoImage');
-		if (!download_link && !image_element) {
+		var img = r.response.querySelector('.fbPhotoImage');
+		if (!link && !img) {
 			p.log(
-				'error: no download link or photo found on photo page, ' +
-				'are you accepting third party cookies?'
+				'error: no photo found on photo page, are you' +
+				'accepting third party cookies?'
 			);
 			p.set_status('error');
 			Pa--;
 			Pd++;
 		}
-		// fall back to img's src when no download link given, e.g. cover photos
-		p.photourl = download_link ? download_link.href : image_element.src;
+		// fall back to img src when no download link, e.g. cover photos
+		p.photourl = link ? link.href : img.src;
 	}
 	p.set_status('downloading');
 	p.outfile = p.album.outdir.clone();
+	// get the file name without any query string
 	var orig_name = p.photourl.match(/\/([^\/?]+)(?:\?.*)?$/)[1];
 	switch (O.naming) {
 	case 0:
-		// as of current knowledge, all videos are .mp4 and all photos are .jpg
+		// as of current knowledge, all videos are .mp4 and
+		// all photos are .jpg
 		p.outfile.append(sanitise_fn(padded_number(p) +
 			(p.video ? '.mp4' : '.jpg')));
 		break;
@@ -493,7 +492,8 @@ function handle_photo_page(p, r) {
 		p.outfile.append(sanitise_fn(orig_name));
 		break;
 	case 2:
-		p.outfile.append(sanitise_fn(padded_number(p) + '_' + orig_name));
+		p.outfile.append(sanitise_fn(padded_number(p) +
+			'_' + orig_name));
 		break;
 	}
 	try {
@@ -501,13 +501,13 @@ function handle_photo_page(p, r) {
 	} catch (e) {
 		switch (e.result) {
 		case Cr.NS_ERROR_FILE_NOT_FOUND:
-			p.log('error creating photo file: path would be too long');
+			p.log('error creating photo file: path too long');
 			break;
 		case Cr.NS_ERROR_FILE_ACCESS_DENIED:
 			p.log('error creating photo file: access denied');
 			break;
 		case Cr.NS_ERROR_FILE_ALREADY_EXISTS:
-			p.log('error creating photo file: file already exists');
+			p.log('error creating photo file: file exists');
 			break;
 		default:
 			p.log('error creating photo file: ' + e.message);
@@ -525,9 +525,11 @@ function handle_photo_page(p, r) {
 		onLocationChange: function() {},
 		onSecurityChange: function() {},
 		onStatusChange: function() {},
-		onStateChange: function(aWebProgress, aRequest, aStateFlags, aStatus) {
+		onStateChange: function(aWebProgress, aRequest, aStateFlags,
+			aStatus) {
 			if (wbp.currentState == wbp.PERSIST_STATE_FINISHED) {
-				var chan = aRequest.QueryInterface(Ci.nsIHttpChannel);
+				var chan = aRequest.QueryInterface(
+					Ci.nsIHttpChannel);
 				if (chan.requestSucceeded)
 					handle_photo_success(p);
 				else
