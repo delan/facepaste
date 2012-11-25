@@ -11,12 +11,14 @@ function type() {
 	)
 		return 'user_photos_of';
 	if (
-		/^\/[A-Za-z0-9.]+\/photos_stream$/.test(content.location.pathname) ||
+		/^\/[A-Za-z0-9.]+\/photos_stream$/.test(
+			content.location.pathname) ||
 		/(\?|&)sk=photos_stream(&|$)/.test(content.location.search)
 	)
 		return 'user_photos';
 	if (
-		/^\/[A-Za-z0-9.]+\/photos_albums$/.test(content.location.pathname) ||
+		/^\/[A-Za-z0-9.]+\/photos_albums$/.test(
+			content.location.pathname) ||
 		/(\?|&)sk=photos_albums(&|$)/.test(content.location.search)
 	)
 		return 'user_albums';
@@ -32,11 +34,10 @@ function showhide() {
 	document.getElementById('facepaste_menuitem').hidden = !type();
 }
 
-/*
-	very weird; without waiting for the load event, calling d.gEBI('cACM') will
-	mysteriously perma-hide all custom menu entries from any add-on, with no
-	errors
-*/
+// you MUST wait for the load event to fire before touching
+// contentAreaContextMenu; if you even get the element before load is fired,
+// all entries from any extensions will be permanently hidden for the entire
+// browser session, with no errors thrown
 
 addEventListener('load', function(e) {
 	document.getElementById('facepaste_menuitem').
