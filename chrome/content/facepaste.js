@@ -467,12 +467,13 @@ function get_photo(p) {
 function handle_photo_page(p, r) {
 	p.log('successfully received photo page, creating photo file');
 	if (p.video) {
-		var hqmatch = r.response.body.innerHTML.match(
-			/\["highqual_src",("[^"]+")\]/);
-		var match = r.response.body.innerHTML.match(
-			/\["video_src",("[^"]+")\]/);
-			p.photourl = decodeURIComponent(JSON.parse(
-				(hqmatch || match)[1]));
+		var hdmatch = r.response.body.innerHTML.match(
+			/hd_src\\u002522\\u00253A\\u002522(.*?)\\u002522/);
+		var sdmatch = r.response.body.innerHTML.match(
+			/sd_src\\u002522\\u00253A\\u002522(.*?)\\u002522/);
+		p.photourl = decodeURIComponent(JSON.parse(
+			'"' + (hdmatch || sdmatch)[1] + '"')).
+			replace(/\\/g, '');
 	} else {
 		var link = _(r.response.querySelectorAll('a')).filter(
 			function(x) {
