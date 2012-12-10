@@ -26,6 +26,11 @@ title="Download facebook albums with facepaste">
 				<radio label="Unique Facebook ID"/>
 				<radio label="Both numbers and IDs"/>
 			</radiogroup>
+			<label value="Action when album folder exists"/>
+			<radiogroup id="albumexists">
+				<radio label="Merge and update"/>
+				<radio label="Skip album"/>
+			</radiogroup>
 		</groupbox>
 		</box>
 		<box align="right">

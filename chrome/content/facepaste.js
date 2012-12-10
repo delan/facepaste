@@ -159,6 +159,7 @@ function browse() {
 
 function start() {
 	O.naming = $$('#naming').selectedIndex;
+	O.albumexists = $$('#albumexists').selectedIndex;
 	// get_selected_albums MUST be called before hiding the lobby because
 	// when a XUL listbox is hidden, its selection state is destroyed
 	get_selected_albums();
@@ -344,10 +345,15 @@ function start_album(i) {
 	a.set_status('preparing');
 	a.log('creating album folder');
 	a.outdir = outdir.clone();
-	a.outdir.append(sanitise_fn(a.name));
+	var fn = sanitise_fn(a.name);
+	var aid = a.url.match(/\?set=a\.(\d+)/);
+	if (aid)
+		fn += ' (' + aid[1] + ')';
+	a.outdir.append(fn);
 	try {
 		a.outdir.create(Ci.nsIFile.DIRECTORY_TYPE, 0755);
 	} catch (e) {
+		var error_occurred = true;
 		switch (e.result) {
 		case Cr.NS_ERROR_FILE_NOT_FOUND:
 			a.log('error creating album folder: path too long');
@@ -356,17 +362,27 @@ function start_album(i) {
 			a.log('error creating album folder: access denied');
 			break;
 		case Cr.NS_ERROR_FILE_ALREADY_EXISTS:
-			a.log('error creating album folder: folder exists');
+			switch (O.albumexists) {
+			case 0:
+				a.log('album folder exists: updating album');
+				error_occurred = false;
+				break;
+			case 1:
+				a.log('album folder exists: skipping album');
+				break;
+			}
 			break;
 		default:
 			a.log('error creating album folder: ' + e.message);
 			break;
 		}
-		a.set_status('error');
-		Ad++;
-		if (A[i + 1])
-			start_album(i + 1);
-		return;
+		if (error_occurred) {
+			a.set_status('error');
+			Ad++;
+			if (A[i + 1])
+				start_album(i + 1);
+			return;
+		}
 	}
 	a.log('fetching album index');
 	new_browser();
