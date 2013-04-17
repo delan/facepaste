@@ -6,22 +6,24 @@ function type() {
 	if (content.location.pathname == '/media/set/')
 		return 'album';
 	if (
+		/^\/[A-Za-z0-9.]+\/photos_albums$/.test(
+			content.location.pathname) ||
+		/(\?|&)sk=photos_albums(&|$)/.test(content.location.search) ||
+		/(\?|&)collection_token=.*6$/.test(content.location.search)
+	)
+		return 'user_albums';
+	if (
+		/^\/[A-Za-z0-9.]+\/photos_stream$/.test(
+			content.location.pathname) ||
+		/(\?|&)sk=photos_stream(&|$)/.test(content.location.search) ||
+		/(\?|&)collection_token=.*5$/.test(content.location.search)
+	)
+		return 'user_photos';
+	if (
 		/^\/[A-Za-z0-9.]+\/photos$/.test(content.location.pathname) ||
 		/(\?|&)sk=photos(&|$)/.test(content.location.search)
 	)
 		return 'user_photos_of';
-	if (
-		/^\/[A-Za-z0-9.]+\/photos_stream$/.test(
-			content.location.pathname) ||
-		/(\?|&)sk=photos_stream(&|$)/.test(content.location.search)
-	)
-		return 'user_photos';
-	if (
-		/^\/[A-Za-z0-9.]+\/photos_albums$/.test(
-			content.location.pathname) ||
-		/(\?|&)sk=photos_albums(&|$)/.test(content.location.search)
-	)
-		return 'user_albums';
 	return '';
 }
 

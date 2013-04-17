@@ -251,7 +251,8 @@ function start_enable() {
 }
 
 function get_user_name() {
-	return $$c('.name .uiButtonText').textContent;
+	var c = $$c('.name .uiButtonText');
+	return (c ? c.textContent : $$c('#fbProfileCover h2 a').textContent);
 }
 
 function get_page_description() {
@@ -302,7 +303,7 @@ function get_available_albums() {
 		});
 		$b('.albumThumbLink').map(function(x) {
 			var a = new Album;
-			a.name = x.parentNode.querySelector(
+			a.name = get_user_name() + ' - ' + x.parentNode.querySelector(
 				'.photoTextTitle strong').textContent;
 			a.url = x.href;
 			A.push(a);
