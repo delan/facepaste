@@ -21,7 +21,8 @@ function type() {
 		return 'user_photos';
 	if (
 		/^\/[A-Za-z0-9.]+\/photos$/.test(content.location.pathname) ||
-		/(\?|&)sk=photos(&|$)/.test(content.location.search)
+		/(\?|&)sk=photos(&|$)/.test(content.location.search) ||
+		/(\?|&)collection_token=.*4$/.test(content.location.search)
 	)
 		return 'user_photos_of';
 	return '';
