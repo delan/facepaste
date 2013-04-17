@@ -303,7 +303,7 @@ function get_available_albums() {
 		});
 		$b('.albumThumbLink').map(function(x) {
 			var a = new Album;
-			a.name = get_user_name() + ' - ' + x.parentNode.querySelector(
+			a.name = x.parentNode.querySelector(
 				'.photoTextTitle strong').textContent;
 			a.url = x.href;
 			A.push(a);
