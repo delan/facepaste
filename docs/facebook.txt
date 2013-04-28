@@ -12,6 +12,7 @@ Contents
 4.0	Detecting the ELIGIBLE PAGE
 5.0	Building the URL for the TARGET's ALBUMLIST
 6.0	Populating available ALBUMS
+7.0	Fetching photos and videos for an ALBUM
 
 1.0	Introduction
 --------------------
@@ -228,3 +229,54 @@ GROUP  | 2
 
 2.	The same process as in check #1, but the initial selector should be
 	'a.uiMediaThumbAlb' instead of 'a.albumThumbLink'.
+
+7.0	Fetching photos and videos for an ALBUM
+-----------------------------------------------
+
+7.1	Photos
+--------------
+
+In all ALBUMS, simply select all elements matching the selector
+'a.uiMediaThumb:not(.uiMediaThumbAlb)'. The 'ajaxify' attribute of each element
+will contain a query parameter, 'src', which is the URL for the high-resolution
+image file.
+
+7.2	Videos
+--------------
+
+Videos are a little more difficult. Select all elements matching 'a.uiVideoLink'
+to get their 'href' attributes, which contain the URLs of video pages.
+
+For each of these URLs, fetch their sources, then match against the regular
+expression: \u002522hd_src\u002522\u00253A\u002522.+?\u002522
+
+Something like this will remain:
+
+\u002522hd_src\u002522\u00253A\u002522https\u00253A\u00255C\u00252F\u00255C\u002
+52Ffbcdn-video-x.akamaihd.net\u00255C\u00252Fxxx-xx-xxxx\u00255C\u00252Fx\u00255
+C\u00252Fxxxxxx\u00255C\u00252Fx\u00255C\u00252Fxxxxxxxxxxxxxxx_xxxxx.mp4\u00253
+Foh\u00253Dxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\u002526oe\u00253Dxxxxxxxx\u002526__g
+da__\u00253Dxxxxxxxxxx_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\u002522
+
+You will be amazed at the amount of unwrapping we'll have to go through.
+
+1.	Resolve the Unicode backslash escapes. eval() is dumb and unsafe, so
+	we'll use JSON.parse() instead: s = JSON.parse('"' + s + '"');
+
+%22hd_src%22%3A%22https%3A%5C%2F%5C%2Ffbcdn-video-x.akamaihd.net%5C%2Fxxx-xx-xxx
+x%5C%2Fx%5C%2Fxxxxxx%5C%2Fx%5C%2Fxxxxxxxxxxxxxxx_xxxxx.mp4%3Foh%3Dxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxx%26oe%3Dxxxxxxxx%26__gda__%3Dxxxxxxxxxx_xxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxx%22
+
+2.	Then run decodeURIComponent() over it: s = decodeURIComponent(s);
+
+"hd_src":"https:\/\/fbcdn-video-x.akamaihd.net\/xxx-xx-xxxx\/x\/xxxxxx\/x\/xxxxx
+xxxxxxxxxx_xxxxx.mp4?oh=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&oe=xxxxxxxx&__gda__=xxx
+xxxxxxx_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+3.	Hey, that's starting to look familiar now. More JSON, so let's treat it
+	like an object and parse: s = JSON.parse('{' + s + '}').hd_src;
+
+https://fbcdn-video-x.akamaihd.net/xxx-xx-xxxx/x/xxxxxx/x/xxxxxxxxxxxxxxx_xxxxx.
+mp4?oh=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&oe=xxxxxxxx&__gda__=xxxxxxxxxx_xxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxx
