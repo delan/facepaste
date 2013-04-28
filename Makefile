@@ -1,4 +1,5 @@
 all: clean
-	zip -r facepaste.xpi chrome chrome.manifest install.rdf
+	cd firefox; zip -r ../build/facepaste.xpi *
 clean:
-	rm -f facepaste.xpi
+	rm -rf build
+	mkdir -p build
