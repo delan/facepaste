@@ -1,47 +1,230 @@
 Living documentation of Facebook UI details
 ===========================================
 
-Eligible URL patterns for invocation
-------------------------------------
+Contents
+--------
 
-Note carefully that the kind of page implied by a non-(A) pattern without the
-'collection_token' URL parameter depends on whether or not the user is a friend.
-Please see below for how to detect this.
+1.0	Introduction
+2.0	Definitions
+	2.1	Terms
+	2.2	Kinds of PAGES
+3.0	Download workflow
+4.0	Detecting the ELIGIBLE PAGE
+5.0	Building the URL for the TARGET's ALBUMLIST
+6.0	Populating available ALBUMS
+
+1.0	Introduction
+--------------------
+
+This is 'living documentation' because by the time I 'finish' it, Facebook will
+probably have yet another layout change, requiring a whole heap of changes.
+Still, it is essential to have this documentation, as without it, the addon will
+become an unmaintainable mess of hacks upon hacks to patch up new layouts.
+
+What makes downloading Facebook albums harder than it appears is that while the
+UI probably has great internal documentation for the developers, from an
+external perspective it's both confusing and vastly inconsistent.
+
+For example, the Photos UI for people, pages and groups are all completely
+different from one another. The UI for groups is the oldest, which all photos
+UIs used to be pre-Timeline-update. Then, the Timeline update rolled out, and
+people and pages got this brand new interface, but groups didn't get updated.
+
+Finally, in early 2013, another update arrived, but only people were affected.
+Now we have people on the 'v3' UI, pages on the 'v2' UI and groups on 'v1'.
+
+There are more minute factors that fragment the algorithms for this addon even
+further. Somehow, even after Facebook appeared to force everyone to have a
+username by assigning them automatically where missing, a small minority still
+don't have alphanumeric usernames. The URL formats for those with and without
+usernames are completely different.
+
+Great.
+
+2.0	Definitions
+-------------------
+
+2.1	Terms
+-------------
+
+USER		The client that is interacting with the browser.
+
+PAGE		Any document that can be viewed in a browser (compare EGAP).
+
+CURRENT PAGE	The page which the interactive user's browser is viewing.
+
+PERSON		The account for a human on Facebook.
+
+EGAP		An organisation or thing which can be 'liked' (compare PAGE).
+
+GROUP		A Facebook entity which can accept membership of USERS.
+
+TARGET		A PERSON, EGAP or GROUP for which a download can be invoked.
+
+ALBUM		A set of photos and/or videos owned by a TARGET.
+
+ALBUMLIST	A PAGE that contains a list of ALBUMS for a TARGET.
+
+SPECIAL ALBUM	An ALBUM which contains 'Photos of' or 'Photos [by]' a TARGET.
+
+GENERIC ALBUM	An ALBUM which is not a SPECIAL ALBUM.
+
+ELIGIBLE PAGE	The primary PAGE of a TARGET. Not a PAGE for the TARGET's
+		ALBUMLIST, ALBUM, post, photo, video, details, etc.
+
+WORDIFIER	The alphanumeric identifier for a TARGET that appears in URLs.
+
+NUMIFIER	The numeric identifier for a TARGET without a WORDIFIER.
+
+HUMANIFIER	The human-readable, long identifier for a TARGET.
+
+PMAGIC		The magic number '2305272732', used in URLs for SPECIAL ALBUMS.
+
+2.2	Kinds of PAGES
+----------------------
+
+(A)	GENERIC ALBUM
+(B)	SPECIAL ALBUM: 'Photos [by]' a TARGET
+(E)	EGAP
+(G)	GROUP
+(H)	PERSON
+(L)	list of ALBUMS
+(O)	SPECIAL ALBUM: 'Photos of' a TARGET
+(P)	individual photo
+(V)	individual video
+
+3.0	Download workflow
+-------------------------
+
+1.	USER browses to the primary PAGE of a TARGET.
+2.	USER activates the addon using their browser's context menu.
+3.	USER chooses one or more ALBUMS to download from the TARGET.
+
+4.0	Detecting the ELIGIBLE PAGE
+-----------------------------------
+
+Good design and Mozilla's review process dictates that the context menu option
+for download invocation should only be made visible on a relevant PAGE. After
+all, it is a *context* menu.
+
+If the URL of the CURRENT PAGE has path 'profile.php' and a query parameter
+matching 'id=(\d+)', then the PAGE is an ELIGIBLE PAGE, and the TARGET is a
+PERSON that has no WORDIFIER.
+
+If the URL of the CURRENT PAGE has path matching
+'pages\/([A-Za-z0-9-]+)\/(\d+)', then the PAGE is an ELIGIBLE PAGE, and the
+TARGET is an EGAP that has no WORDIFIER.
+
+If the URL of the CURRENT PAGE has path matching 'groups\/(\d+)\/', then the
+PAGE is an ELIGIBLE PAGE, and the TARGET is a GROUP that has no WORDIFIER.
+
+If the URL of the CURRENT PAGE has path matching 'groups\/([A-Za-z0-9.]{5,})\/'
+but does not match 'groups\/(\d+)\/', then the PAGE is an ELIGIBLE PAGE, and the
+TARGET is a GROUP with a WORDIFIER.
+
+If the URL of the CURRENT PAGE has path matching '([A-Za-z0-9.]{5,})', then the
+PAGE could be an ELIGIBLE PAGE, and if so, the TARGET could be a PERSON or EGAP
+with a WORDIFIER.
+
+This situation can be disambiguated by checking for the presence of:
+
+*	#timelineHeadlineLikeButton: guaranteed ELIGIBLE PAGE, TARGET is an EGAP
+*	div.profileHeaderButton.FriendButton: ELIGIBLE PAGE, TARGET is a PERSON
+
+Otherwise, the CURRENT PAGE is not an ELIGIBLE PAGE.
+
+5.0	Building the URL for the TARGET's ALBUMLIST
+---------------------------------------------------
+
+When the USER initiates a download on an ELIGIBLE PAGE, the URL of the TARGET's
+ALBUMLIST needs to be generated so that it can later be fetched.
 
 --------------------------------------------------------------------------------
-Has username? / Is a friend? / Kind of page / Regular expression
+WORDIFIER | TARGET | * | Output URL for ALBUMLIST
 --------------------------------------------------------------------------------
-* | * | A | media\/set\/\?set=[a-z0-9.]+&type=\d+
-T | T | O | [A-Za-z0-9.]{5,}\/photos
-T | F | B | [A-Za-z0-9.]{5,}\/photos
-T | T | O | [A-Za-z0-9.]{5,}\/photos\?collection_token=\d+:\d+:4
-T | T | B | [A-Za-z0-9.]{5,}\/photos\?collection_token=\d+:\d+:5
-T | F | B | [A-Za-z0-9.]{5,}\/photos\?collection_token=\d+:\d+:5
-T | T | L | [A-Za-z0-9.]{5,}\/photos\?collection_token=\d+:\d+:6
-T | F | L | [A-Za-z0-9.]{5,}\/photos\?collection_token=\d+:\d+:6
-F | T | O | profile.php\?id=\d+&sk=photos
-F | F | B | profile.php\?id=\d+&sk=photos
-F | T | O | profile.php\?id=\d+&sk=photos&collection_token=\d+:\d+:4
-F | T | B | profile.php\?id=\d+&sk=photos&collection_token=\d+:\d+:5
-F | F | B | profile.php\?id=\d+&sk=photos&collection_token=\d+:\d+:5
-F | T | L | profile.php\?id=\d+&sk=photos&collection_token=\d+:\d+:6
-F | F | L | profile.php\?id=\d+&sk=photos&collection_token=\d+:\d+:6
---------------------------------------------------------------------------------
-Kind:	(O) Photos of	(B) Photos by	(L) Album list	(A) Generic album
+Y         | PERSON | 1 | /WORDIFIER/photos_albums
+Y         | EGAP   |   | /WORDIFIER/photos_albums
+Y         | GROUP  |   | /groups/WORDIFIER/photos/
+N         | PERSON | 2 | /profile.php?id=NUMIFIER&sk=photos_albums
+N         | EGAP   | 3 | /pages/x/NUMIFIER?sk=photos_albums
+N         | GROUP  |   | /groups/NUMIFIER/photos/
 --------------------------------------------------------------------------------
 
-Who is a friend?
-----------------
+1.	This is now '/WORDIFIER/photos?collection_token=NUMIFIER:PMAGIC:6' but
+	thankfully the old syntax works. Otherwise we would have to find out the
+	PERSON's NUMIFIER, which appears to be difficult.
 
-On eligible pages belonging to friends, links will be present that will have an
-'aria-controls' attribute matching the following regular expressions:
+2.	This is now '...&sk=photos&collection_token=NUMIFIER:PMAGIC:6' but the
+	old syntax still works. We know the NUMIFIER, so this syntax is not more
+	difficult to generate, but it's longer so we prefer the old.
 
---------------------------------------------------------------------------------
-Kind of page / Regular expression
---------------------------------------------------------------------------------
-O | pagelet_timeline_app_collection_\d+:\d+:4
-B | pagelet_timeline_app_collection_\d+:\d+:5
-L | pagelet_timeline_app_collection_\d+:\d+:6
---------------------------------------------------------------------------------
+3.	The 'x' is the hyphenated 'SEO-friendly' component generated from the
+	EGAP's HUMANIFIER. Thankfully anything is accepted here, so we don't
+	have to find it out.
 
-Eligible pages belonging to non-friends will not have the first link.
+6.0	Populating available ALBUMS
+-----------------------------------
+
+Once the ALBUMLIST URL has been generated, and the ALBUMLIST has been fetched,
+it needs to be parsed for ALBUMS available for download.
+
+For SPECIAL ALBUMS, check for the presence of links to (O) and (B) albums with
+the method as follows:
+
+---------------------------
+TARGET | Checks to execute
+---------------------------
+PERSON | 1, 2
+EGAP   | 3, 4
+GROUP  | 5
+---------------------------
+
+1.	Check for an 'a' element with its 'aria-controls' matching
+	'pagelet_timeline_app_collection_NUMIFIER:PMAGIC:4'. If it exists, add
+	an album named 'Photos of HUMANIFIER', with the URL being:
+	*	'/WORDIFIER/photos' if the TARGET has a WORDIFIER
+	*	'/profile.php?id=NUMIFIER&sk=photos' otherwise
+
+2.	Check for an 'a' element with its 'aria-controls' matching
+	'pagelet_timeline_app_collection_NUMIFIER:PMAGIC:5'. If it exists, add
+	an album named 'Photos by HUMANIFIER', with the URL being:
+	*	'/WORDIFIER/photos_stream' if the TARGET has a WORDIFIER
+	*	'/profile.php?id=NUMIFIER&sk=photos_stream' otherwise
+
+3.	Check for an 'a.fbPhotosRedesignNavContent' element with an indirect
+	'i' descendant containing class 'sx_859619' (this is a sprite key). If
+	it exists, add an album named 'Photos of HUMANIFIER', with the URL
+	being:
+	*	'/WORDIFIER/photos' if the TARGET has a WORDIFIER
+	*	'/pages/x/NUMIFIER?sk=photos' otherwise
+
+4.	Check for an 'a.fbPhotosRedesignNavContent' element with an indirect
+	'i' descendant containing class 'sx_511ed3' (this is a sprite key). If
+	it exists, add an album named 'Photos by HUMANIFIER', with the URL
+	being:
+	*	'/WORDIFIER/photos_stream' if the TARGET has a WORDIFIER
+	*	'/pages/x/NUMIFIER?sk=photos_stream' otherwise
+
+5.	The ALBUMLIST of a GROUP also happens to be the ALBUM of 'Photos by', so
+	add an album named 'Photos by HUMANIFIER', with the URL being:
+	*	'/groups/WORDIFIER/photos/' if the TARGET has a WORDIFIER
+	*	'/groups/NUMIFIER/photos/' otherwise
+
+For GENERIC ALBUMS, check for the presence of (A) albums with the method as
+follows:
+
+---------------------------
+TARGET | Checks to execute
+---------------------------
+PERSON | 1
+EGAP   | 1
+GROUP  | 2
+---------------------------
+
+1.	Select all elements matching 'a.albumThumbLink'. For each of these, add
+	an album with the URL equal to the element's 'href' attribute. Then,
+	traverse to the element's parent, and find the descendant matching
+	'a.photoTextTitle strong'. The content of this element is the title.
+
+2.	The same process as in check #1, but the initial selector should be
+	'a.uiMediaThumbAlb' instead of 'a.albumThumbLink'.
