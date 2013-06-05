@@ -3,7 +3,7 @@
 function type() {
 	if (content.location.hostname != 'www.facebook.com')
 		return '';
-	if (content.location.pathname == '/media/set/')
+	if (content.location.pathname == '/media/set/' || content.location.pathname.indexOf('media_set') !== -1)
 		return 'album';
 	if (
 		/^\/[A-Za-z0-9.]+\/photos_albums$/.test(
