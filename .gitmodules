@@ -1,0 +1,3 @@
+[submodule "data/content/panel/contrib/lumberjack"]
+	path = data/content/panel/contrib/lumberjack
+	url = https://github.com/delan/lumberjack

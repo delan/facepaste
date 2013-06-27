@@ -1,0 +1,14 @@
+{
+	"name": "facepaste",
+	"fullName": "Facepaste",
+	"id": "facepaste.firefox.addon@azabani.com",
+	"description": "Download photos and videos from Facebook albums",
+	"author": "Delan Azabani <delan@azabani.com>",
+	"license": "MIT",
+	"version": "2.8",
+	"icon": "data/icons/icon48.png",
+	"icon64": "data/icons/icon64.png",
+	"permissions": {
+		"private-browsing": false
+	}
+}

@@ -1,0 +1,79 @@
+* {
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	border: none;
+	outline: none;
+}
+html {
+	font: 16px sans-serif;
+}
+body {
+	position: relative;
+	width: 768px;
+	height: 448px;
+	top: 16px;
+	/* sdk opens smaller window, as narrow as 788px, if icon is too close
+	   to the right of the screen, balance this variable space evenly */
+	margin: 0 auto;
+}
+header {
+	position: absolute;
+	width: 768px;
+	height: 40px;
+	left: 0;
+	top: 0;
+	background: url(../../../icons/icon32.png) no-repeat top 4px left 4px;
+}
+	h1 {
+		font-size: 30px;
+		position: absolute;
+		left: 48px;
+		top: 5px;
+	}
+	nav {
+		position: absolute;
+		right: 0;
+		top: 6px;
+	}
+		nav li {
+			display: inline-block;
+		}
+		nav a {
+			display: inline-block;
+			margin: 2px;
+			padding: 4px;
+		}
+		nav .active {
+			outline: 1px solid red;
+		}
+section {
+	display: none;
+	position: absolute;
+	width: 768px;
+	height: 408px;
+	left: 0;
+	bottom: 0;
+}
+section.active {
+	display: block;
+}
+a {
+	color: black;
+	text-decoration: none;
+}
+.ellipsis {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+#log {
+	display: block;
+	overflow-y: scroll;
+	resize: none;
+	background: none;
+	/* explicit size required for textarea */
+	width: 768px;
+	height: 408px;
+}
