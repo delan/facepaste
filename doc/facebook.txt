@@ -97,8 +97,8 @@ PMAGIC		The magic number '2305272732', used in URLs for SPECIAL ALBUMS.
 3.0	Download workflow
 -------------------------
 
-1.	USER browses to the primary PAGE of a TARGET.
-2.	USER activates the addon using their browser's context menu.
+1.	USER browses to an ELIGIBLE PAGE.
+2.	USER activates the addon panel, from the 'Add-on Bar' by default.
 3.	USER chooses one or more ALBUMS to download from the TARGET.
 
 4.0	Detecting the ELIGIBLE PAGE
