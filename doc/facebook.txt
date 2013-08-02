@@ -193,7 +193,7 @@ A.	The HUMANIFIER can be found as the text content of a._8_2
 	*	'/WORDIFIER/photos_all' if the TARGET has a WORDIFIER
 	*	'/profile.php?id=NUMIFIER&sk=photos_stream' otherwise
 
-B.	The HUMANIFIER can be found as the text content of [itemprop=name]
+B.	The HUMANIFIER can be found as the text content of .nameButton
 
 3.	Check for an 'a.fbPhotosRedesignNavContent' element with an indirect
 	'i' descendant containing class 'sx_5ce602' (this is a sprite key). If

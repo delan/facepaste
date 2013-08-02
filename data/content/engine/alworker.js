@@ -17,7 +17,7 @@ function humanifier_person() {
 }
 
 function humanifier_egap() {
-	return document.querySelector('[itemprop=name]').textContent;
+	return document.querySelector('.nameButton').textContent;
 }
 
 function humanifier_group() {
