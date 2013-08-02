@@ -199,7 +199,7 @@ GROUP  | 5
 	*	'/pages/x/NUMIFIER?sk=photos' otherwise
 
 4.	Check for an 'a.fbPhotosRedesignNavContent' element with an indirect
-	'i' descendant containing class 'sx_bc761e' (this is a sprite key). If
+	'i' descendant containing class 'sx_cdf4e6' (this is a sprite key). If
 	it exists, add an album named 'Photos by HUMANIFIER', with the URL
 	being:
 	*	'/WORDIFIER/photos_stream' if the TARGET has a WORDIFIER
