@@ -195,14 +195,14 @@ GROUP  | 5
 	'i' descendant containing class 'sx_859619' (this is a sprite key). If
 	it exists, add an album named 'Photos of HUMANIFIER', with the URL
 	being:
-	*	'/WORDIFIER/photos_of' if the TARGET has a WORDIFIER
+	*	'/WORDIFIER/photos' if the TARGET has a WORDIFIER
 	*	'/pages/x/NUMIFIER?sk=photos' otherwise
 
 4.	Check for an 'a.fbPhotosRedesignNavContent' element with an indirect
 	'i' descendant containing class 'sx_511ed3' (this is a sprite key). If
 	it exists, add an album named 'Photos by HUMANIFIER', with the URL
 	being:
-	*	'/WORDIFIER/photos_all' if the TARGET has a WORDIFIER
+	*	'/WORDIFIER/photos_stream' if the TARGET has a WORDIFIER
 	*	'/pages/x/NUMIFIER?sk=photos_stream' otherwise
 
 5.	The ALBUMLIST of a GROUP also happens to be the ALBUM of 'Photos by', so
