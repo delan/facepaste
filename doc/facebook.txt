@@ -242,7 +242,7 @@ GROUP  | 2
 --------------
 
 In all ALBUMS, simply select all elements matching the selector
-'a.uiMediaThumb:not(.uiMediaThumbAlb)'. The 'ajaxify' attribute of each element
+'a.uiMediaThumb:not(.uiMediaThumbAlb)'. The 'href' attribute of each element
 will contain a query parameter, 'src', which is the URL for the high-resolution
 image file.
 
