@@ -8,7 +8,6 @@ function log() {
 }
 
 function response(payload) {
-	log('> main', JSON.stringify(payload));
 	self.port.emit('eligible', payload);
 }
 

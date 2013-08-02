@@ -38,6 +38,8 @@ The extension uses port events over messages where possible, for two reasons:
 2.1	Main code (lib/)
 ------------------------
 
+*	albumlist.js	Fetches available albums.
+*	log.js		Common logging and debugging facilities for main code.
 *	main.js		Bootstraps the extension and UI, and handles events.
 
 2.2	Panel code (data/content/panel/js/)
@@ -48,4 +50,5 @@ The extension uses port events over messages where possible, for two reasons:
 2.3	Engine code (data/content/engine/)
 ------------------------------------------
 
+*	alworker.js	Page worker for albumlist.js.
 *	eligible.js	Tells main.js if the current tab has an eligible page.
