@@ -22,9 +22,9 @@ self.port.on('log', function(payload) {
 });
 
 // poor man's REPL
-// $('#log').click(function() {
-// 	log('repl:', eval(prompt()));
-// });
+$('#log').click(function() {
+	log('repl:', eval(prompt()));
+});
 
 $(window).on('hashchange', hashchange);
 

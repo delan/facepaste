@@ -1,0 +1,51 @@
+Extension architecture
+======================
+
+Contents
+--------
+
+1.0	Introduction
+2.0	Files
+	2.1	Main code (lib/)
+	2.2	Panel code (data/content/panel/js/)
+	2.3	Engine code (data/content/engine/)
+3.0	Events
+
+1.0	Introduction
+--------------------
+
+Version 3 marks a change from being implemented directly as an XUL extension to
+utilising Mozilla's new Add-on SDK. This provides a number of benefits,
+including faster development and review, better API documentation and the
+extension being restartless without any additional effort, while retaining
+access to XPCOM where required (e.g. for local filesystem I/O).
+
+For the purposes of security and a future multi-process Firefox, the SDK
+requires that extension code is separated between 'add-on code' in lib/ and
+'content scripts' in data/, the latter being used to interact with the extension
+UI (panel) and pages (page-worker). Add-on code and content scripts interact via
+messages (postMessage/self.on('message')) or port events (port.emit/port.on).
+
+The extension uses port events over messages where possible, for two reasons:
+
+*	Extensibility: each event requires a name in addition to the payload.
+*	Timing: port events are queued until despatch, but messages create a
+	race condition; they fail if posted before the receiver is ready.
+
+2.0	Files
+-------------
+
+2.1	Main code (lib/)
+------------------------
+
+*	main.js		Bootstraps the extension and UI, and handles events.
+
+2.2	Panel code (data/content/panel/js/)
+-------------------------------------------
+
+*	ui.js		Primary UI code for data/content/panel/html/ui.html
+
+2.3	Engine code (data/content/engine/)
+------------------------------------------
+
+*	eligible.js	Tells main.js if the current tab has an eligible page.
