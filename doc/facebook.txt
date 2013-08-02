@@ -174,10 +174,12 @@ the method as follows:
 ---------------------------
 TARGET | Checks to execute
 ---------------------------
-PERSON | 1, 2
-EGAP   | 3, 4
-GROUP  | 5
+PERSON | A, 1, 2
+EGAP   | B, 3, 4
+GROUP  | C, 5
 ---------------------------
+
+A.	The HUMANIFIER can be found as the text content of a._8_2
 
 1.	Check for an 'a' element with its 'aria-controls' matching
 	'pagelet_timeline_app_collection_NUMIFIER:PMAGIC:4'. If it exists, add
@@ -190,6 +192,8 @@ GROUP  | 5
 	an album named 'Photos by HUMANIFIER', with the URL being:
 	*	'/WORDIFIER/photos_all' if the TARGET has a WORDIFIER
 	*	'/profile.php?id=NUMIFIER&sk=photos_stream' otherwise
+
+B.	The HUMANIFIER can be found as the text content of [itemprop=name]
 
 3.	Check for an 'a.fbPhotosRedesignNavContent' element with an indirect
 	'i' descendant containing class 'sx_5ce602' (this is a sprite key). If
@@ -204,6 +208,8 @@ GROUP  | 5
 	being:
 	*	'/WORDIFIER/photos_stream' if the TARGET has a WORDIFIER
 	*	'/pages/x/NUMIFIER?sk=photos_stream' otherwise
+
+C.	The HUMANIFIER can be found as the text content of #groupsJumpTitle
 
 5.	The ALBUMLIST of a GROUP also happens to be the ALBUM of 'Photos by', so
 	add an album named 'Photos by HUMANIFIER', with the URL being:
