@@ -8,6 +8,26 @@
 	"version": "2.8",
 	"icon": "data/icons/icon48.png",
 	"icon64": "data/icons/icon64.png",
+	"preferences": [{
+		"name": "outputDirectory",
+		"type": "directory",
+		"title": "Output directory"
+	}, {
+		"name": "namingScheme",
+		"type": "radio",
+		"title": "Output file naming",
+		"value": "order",
+		"options": [{
+			"value": "order",
+			"label": "Numbered in order"
+		}, {
+			"value": "unique",
+			"label": "Unique Facebook ID"
+		}, {
+			"value": "both",
+			"label": "Both numbers and IDs"
+		}]
+	}],
 	"permissions": {
 		"private-browsing": false
 	}
