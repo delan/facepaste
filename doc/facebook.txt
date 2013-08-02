@@ -246,6 +246,11 @@ In all ALBUMS, simply select all elements matching the selector
 attribute of each element will contain a query parameter, 'src', which is the
 URL for the high-resolution image file.
 
+In the special album containing photos by GROUPS, however, the photo links will
+not have the image URL in their URLs. To handle this old behaviour, fetch the
+source of the link target, and match:
+<a class="fbPhotosPhotoActionsItem" href="([^"]+)" rel="ignore" target="_blank">
+
 7.2	Videos
 --------------
 
