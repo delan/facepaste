@@ -1,5 +1,3 @@
-(function() {
-
 function log() {
 	self.port.emit('log', {
 		source: 'ui',
@@ -32,5 +30,3 @@ location.hash = 's_log';
 hashchange();
 
 log('ready for action');
-
-})();
