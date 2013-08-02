@@ -253,9 +253,9 @@ Videos are a little more difficult. Select all elements matching 'a.uiVideoLink'
 to get their 'href' attributes, which contain the URLs of video pages.
 
 For each of these URLs, fetch their sources, then match against the regular
-expression: \u002522hd_src\u002522\u00253A\u002522.+?\u002522
+expression: \\u002522hd_src\\u002522\\u00253A\\u002522.+?\\u002522
 
-Something like this will remain:
+Something like this will remain, literally except for newlines:
 
 \u002522hd_src\u002522\u00253A\u002522https\u00253A\u00255C\u00252F\u00255C\u002
 52Ffbcdn-video-x.akamaihd.net\u00255C\u00252Fxxx-xx-xxxx\u00255C\u00252Fx\u00255
