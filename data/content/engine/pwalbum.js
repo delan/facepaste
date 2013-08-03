@@ -9,25 +9,6 @@ function L() {
 	});
 }
 
-function begin_scrolling(callback) {
-	L('begin_scrolling');
-	var scroll_attempts = 0, scroll_events = 0;
-	window.addEventListener('scroll', function() {
-		L('begin_scrolling: scroll event');
-		scroll_events++;
-	}, false);
-	var timer = window.setInterval(function() {
-		L('begin_scrolling: scroll attempt');
-		scroll_attempts++;
-		window.scrollBy(0, 1000);
-		if (scroll_attempts > scroll_events + 50) {
-			window.clearInterval(timer);
-			if (callback)
-				callback();
-		}
-	}, 100);
-}
-
 function callback_begin_scrolling(payload) {
 	L('callback_begin_scrolling');
 	parse_album_index(payload);
@@ -64,8 +45,10 @@ function parse_album_index(album) {
 }
 
 function handle_album_request_albuminfo(payload) {
-	L('handle_album_request_albuminfo');
-	begin_scrolling(callback_begin_scrolling.bind(null, payload));
+	L('handle_album_request_albuminfo: now scrolling, maybe a while...');
+	$facepaste$shared$.begin_scrolling(
+		callback_begin_scrolling.bind(null, payload)
+	);
 }
 
 function emit_album_response_albuminfo(album) {
