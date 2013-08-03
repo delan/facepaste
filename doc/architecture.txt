@@ -9,6 +9,11 @@ Contents
 	2.1	Main code (lib/)
 	2.2	Panel code (data/content/panel/js/)
 	2.3	Engine code (data/content/engine/)
+	2.4	Shared library code (lib/shared.js)
+3.0	Module relationships and communication
+	3.1	Port events
+	3.2	Callbacks
+4.0	Modules and libraries
 
 1.0	Introduction
 --------------------
@@ -31,23 +36,109 @@ The extension uses port events over messages where possible, for two reasons:
 *	Timing: port events are queued until despatch, but messages create a
 	race condition; they fail if posted before the receiver is ready.
 
+Please refer to any relevant terms in section 2.0, Definitions, of facebook.txt.
+
 2.0	Files
 -------------
+
+Source files must have unique names, even across directories. Try to stick to
+lowercase alphabet and numerals only; avoid capital letters and underscores.
 
 2.1	Main code (lib/)
 ------------------------
 
-*	albumlist.js	Fetches available albums.
-*	log.js		Common logging and debugging facilities for main code.
 *	main.js		Bootstraps the extension and UI, and handles events.
+*	ui.js		Sets up and interacts with panels, widgets, etc.
+*	target.js	Request class that queries the current tab for a TARGET.
+*	albumlist.js	Request class that queries an ALBUMLIST for ALBUMS.
+*	album.js	Request class that queries an ALBUM for MEDIA.
 
 2.2	Panel code (data/content/panel/js/)
 -------------------------------------------
 
-*	ui.js		Primary UI code for data/content/panel/html/ui.html
+*	panel.js	Primary UI code for data/content/panel/html/ui.html.
 
 2.3	Engine code (data/content/engine/)
 ------------------------------------------
 
-*	alworker.js	Page worker for albumlist.js.
-*	eligible.js	Tells main.js if the current tab has an eligible page.
+*	twtarget.js	Tab worker for target.js.
+*	pwalbumlist.js	Page worker for albumlist.js.
+*	pwalbum.js	Page worker for album.js.
+
+2.4	Shared library code (lib/shared.js)
+-------------------------------------------
+
+This file contains common utilities that can be accessed from both main library
+code as well as content scripts and workers.
+
+To load the module from main code:
+
+	var lib_shared = require('./shared');
+
+To attach the module to a worker:
+
+	..., contentScriptFile: sdk_data.url('../lib/shared.js'), ...
+
+The shared module is structured unusually compared to other code because it
+needs to be valid and available in multiple dissimilar contexts.
+
+3.0	Module relationships and communication
+----------------------------------------------
+
+Avoid anonymous callback and handler functions, they are hard to read and cause
+unwieldy levels of indentation.
+
+Try to log a short message in emission, handler and callback functions where
+possible to track data flow. Don't do this for any communications relating to
+logging, or you will generate unnecessary noise and/or cause an infinite loop.
+
+3.1	Port events
+-------------------
+
+Events are used strictly in a request/response format, though responses are
+not required for all situations.
+
+To improve code clarity, all port event names conform to the format:
+
+	(CLIENT)/(SERVER)/(request|response)/(NAME)
+
+Functions that emit port events have names of the format:
+
+	emit_(REMOTE)_(request|response)_(NAME)
+
+Functions that handle received port events have names of the format:
+
+	handle_(REMOTE)_(request|response)_(NAME)
+
+REMOTE is the 'other' module, be it CLIENT or SERVER.
+
+For example, when panel.js requests an ALBUMLIST from ui.js:
+
+1.	In the file		panel.js
+	the function		emit_ui_request_albumlist
+	sends the event 	panel/ui/request/albumlist
+
+2.	In the file		ui.js
+	the function		handle_panel_request_albumlist
+	receives the event	panel/ui/request/albumlist
+
+3.	In the file		ui.js
+	the function		emit_panel_response_albumlist
+	sends the event		panel/ui/response/albumlist
+
+4.	In the file		panel.js
+	the function		handle_ui_response_albumlist
+
+3.1	Callbacks
+-----------------
+
+For asynchronous processes that do not cross contexts, callbacks are used. For
+clarity, all callbacks are named with the format:
+
+	callback_(NAME)
+
+4.0	Modules and libraries
+-----------------------------
+
+When requiring a module, name the variable sdk_(NAME) if the module comes from
+the Add-on SDK, or lib_(NAME) if the module is local to this extension.

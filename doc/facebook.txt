@@ -66,6 +66,8 @@ ALBUM		A set of photos and/or videos owned by a TARGET.
 
 ALBUMLIST	A PAGE that contains a list of ALBUMS for a TARGET.
 
+MEDIUM		A single photo or video belonging to a TARGET.
+
 SPECIAL ALBUM	An ALBUM which contains 'Photos of' or 'Photos [by]' a TARGET.
 
 GENERIC ALBUM	An ALBUM which is not a SPECIAL ALBUM.
