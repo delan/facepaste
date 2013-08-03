@@ -32,7 +32,22 @@ function emit_main_request_albums(payload) {
 
 function handle_main_response_albums(payload) {
 	L('handle_main_response_albums');
-	// TODO: continue implementation here
+	// TODO: replace with real implementation instead of automatically
+	// getting info about the first album
+	emit_main_request_albuminfo(payload[0]);
+}
+
+function emit_main_request_albuminfo(payload) {
+	L('emit_main_request_albuminfo');
+	self.port.emit(
+		'panel/main/request/albuminfo',
+		payload
+	);
+}
+
+function handle_main_response_albuminfo(payload) {
+	L('handle_main_response_albuminfo');
+	// TODO: insert real implementation here
 }
 
 var lumber = new Lumber('#log');
@@ -50,6 +65,11 @@ self.port.on(
 self.port.on(
 	'panel/main/response/albums',
 	handle_main_response_albums
+);
+
+self.port.on(
+	'panel/main/response/albuminfo',
+	handle_main_response_albuminfo
 );
 
 $('#log').click(function() {
