@@ -63,7 +63,8 @@ lowercase alphabet and numerals only; avoid capital letters and underscores.
 
 *	twtarget.js	Tab worker for target.js.
 *	pwalbumlist.js	Page worker for albumlist.js.
-*	pwalbum.js	Page worker for album.js.
+*	pwalbum.js	Page worker for album.js: getting album info.
+*	pwmedium.js	Page worker for album.js: dereferencing indirect media.
 
 2.4	Shared library code (lib/shared.js)
 -------------------------------------------

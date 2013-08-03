@@ -47,7 +47,26 @@ function emit_main_request_albuminfo(payload) {
 
 function handle_main_response_albuminfo(payload) {
 	L('handle_main_response_albuminfo');
-	// TODO: insert real implementation here
+	// TODO: real implementation please
+	for (var i = 0, j = 5; j && i < payload.media.length; i++)
+		if (
+			payload.media[i].type == 'VIDEO_PAGE' ||
+			payload.media[i].type == 'PHOTO_PAGE'
+		)
+			j--,emit_main_request_dereference(payload.media[i]);
+}
+
+function emit_main_request_dereference(payload) {
+	L('emit_main_request_dereference');
+	self.port.emit(
+		'panel/main/request/dereference',
+		payload
+	);
+}
+
+function handle_main_response_dereference(payload) {
+	L('handle_main_response_dereference');
+	// TODO: real implementation please
 }
 
 var lumber = new Lumber('#log');
