@@ -253,6 +253,9 @@ not have the image URL in their URLs. To handle this old behaviour, fetch the
 source of the link target, and match:
 <a class="fbPhotosPhotoActionsItem" href="([^"]+)" rel="ignore" target="_blank">
 
+Alternatively, working with a live document, use the href of:
+a.fbPhotosPhotoActionsItem[rel=ignore]
+
 7.2	Videos
 --------------
 
@@ -292,3 +295,17 @@ xxxxxxx_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 https://fbcdn-video-x.akamaihd.net/xxx-xx-xxxx/x/xxxxxx/x/xxxxxxxxxxxxxxx_xxxxx.
 mp4?oh=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&oe=xxxxxxxx&__gda__=xxxxxxxxxx_xxxxxxxx
 xxxxxxxxxxxxxxxxxxxxxxxx
+
+Alternatively, working with a live document:
+
+Get the 'flashvars' attribute of the only 'embed' element in the document.
+
+Get the 'params' query parameter from this by matching the first capture of:
+
+	(?:^|&)params=([^&]+)(?:&|$)
+
+Run decodeURIComponent() over the resulting string.
+
+Parse the string as a JSON object.
+
+Try object.video_data.hd_src, or fall back to object.video_data.sd_src.
