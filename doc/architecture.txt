@@ -52,6 +52,7 @@ lowercase alphabet and numerals only; avoid capital letters and underscores.
 *	target.js	Request class that queries the current tab for a TARGET.
 *	albumlist.js	Request class that queries an ALBUMLIST for ALBUMS.
 *	album.js	Request class that queries an ALBUM for MEDIA.
+*	download.js	Internal download manager utility class.
 
 2.2	Panel code (data/content/panel/js/)
 -------------------------------------------

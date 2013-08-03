@@ -47,13 +47,9 @@ function emit_main_request_albuminfo(payload) {
 
 function handle_main_response_albuminfo(payload) {
 	L('handle_main_response_albuminfo');
-	// TODO: real implementation please
-	for (var i = 0, j = 5; j && i < payload.media.length; i++)
-		if (
-			payload.media[i].type == 'VIDEO_PAGE' ||
-			payload.media[i].type == 'PHOTO_PAGE'
-		)
-			j--,emit_main_request_dereference(payload.media[i]);
+	// TODO: real implementation please instead of automatically downloading
+	// the first album for testing purposes
+	emit_main_request_download_album(payload);
 }
 
 function emit_main_request_dereference(payload) {
@@ -67,6 +63,14 @@ function emit_main_request_dereference(payload) {
 function handle_main_response_dereference(payload) {
 	L('handle_main_response_dereference');
 	// TODO: real implementation please
+}
+
+function emit_main_request_download_album(payload) {
+	L('emit_main_request_download_album');
+	self.port.emit(
+		'panel/main/request/download_album',
+		payload
+	);
 }
 
 var lumber = new Lumber('#log');
