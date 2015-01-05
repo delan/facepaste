@@ -24,11 +24,11 @@ title="Download facebook albums with facepaste">
 			<radiogroup id="naming">
 				<radio label="Numbered in order"/>
 				<radio label="Unique Facebook ID"/>
-				<radio label="Both numbers and IDs"/>
+				<radio label="Both numbers and IDs" selected="true"/>
 			</radiogroup>
 			<label value="Action when album folder exists"/>
 			<radiogroup id="albumexists">
-				<radio label="Merge and update"/>
+				<radio label="Merge and update" selected="true"/>
 				<radio label="Skip album"/>
 			</radiogroup>
 		</groupbox>

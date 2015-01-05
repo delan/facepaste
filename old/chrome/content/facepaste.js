@@ -10,7 +10,9 @@ var A = [], P = [];
 var Ad = 0, Pd = 0, Pa = 0;
 
 var browser;
-var outdir;
+var outdir = Cc["@mozilla.org/file/directory_service;1"]
+				.getService(Components.interfaces.nsIProperties)
+				.get("DfltDwnld", Components.interfaces.nsIFile);
 var progress_lines = [];
 var progress_lines_used = [50, 25];
 var progress_lines_max = [50, 25];
@@ -132,6 +134,7 @@ function new_browser() {
 /* main actions */
 
 function init() {
+	console.log(O.type);
 	if (O.type == 'user_albums')
 		// autoscroll albums page before calling get_available_albums
 		fetch_album_list();
@@ -143,6 +146,9 @@ function init() {
 	E('#start', 'command', start);
 	E('#cancel', 'command', cancel);
 	E('#cancelrunning', 'command', cancel);
+	
+	// Default Downloads dir path
+	$$('#path').value = outdir.path;
 }
 
 function browse() {
@@ -155,6 +161,7 @@ function browse() {
 		$$('#path').value = outdir.path;
 	}
 	start_enable();
+	console.log(outdir);
 }
 
 function start() {
@@ -251,8 +258,10 @@ function start_enable() {
 }
 
 function get_user_name() {
-	var c = $$c('.name .uiButtonText');
-	return (c ? c.textContent : $$c('#fbProfileCover h2 a').textContent);
+	var c1 = $$c('.name .uiButtonText');
+	var c2 = $$c('#fbProfileCover h2 a');
+	var c3 = $$c('title').textContent.replace(/^[(\d)]*\s+/g,"");
+	return (c1 ? c1.textContent : (c2 ? c2.textContent : (c3 ? c3 : "NONAME")));
 }
 
 function get_page_description() {
