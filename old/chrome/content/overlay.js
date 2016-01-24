@@ -3,25 +3,39 @@
 function type() {
 	if (content.location.hostname != 'www.facebook.com')
 		return '';
-	if (content.location.pathname == '/media/set/')
-		return 'album';
+	// first is for business page album
+	// second is for user album
 	if (
-		/^\/[A-Za-z0-9.]+\/photos_albums$/.test(
-			content.location.pathname) ||
-		/(\?|&)sk=photos_albums(&|$)/.test(content.location.search) ||
+		/^\/media\/set\/$/.test(content.location.pathname) || 
+		/^\/[A-Za-z0-9.]+\/media_set$/.test(content.location.pathname)
+	)
+		return 'album';
+	// \/photos_albums$/ is for user albums
+	// tab=photos_albums is for business page albums
+	// rest might be deprecated, kept for redundancy
+	if (
+		/(\/photos_stream).*?(\?tab=photos_albums)/.test(content.location) || 
+		/^\/[A-Za-z0-9.]+\/photos_albums$/.test(content.location.pathname) || 
+		/(\?|&)sk=photos_albums(&|$)/.test(content.location.search) || 
 		/(\?|&)collection_token=.*6$/.test(content.location.search)
 	)
 		return 'user_albums';
+	// first one is for business page photos, might become deprecated
+	// second is for new user photos (/photos or /photos_all)
+	// but doesn't work directly if user has only albums visible
+	// rest might be deprecated, kept for redundancy
 	if (
-		/^\/[A-Za-z0-9.]+\/photos_stream$/.test(
-			content.location.pathname) ||
-		/(\?|&)sk=photos_stream(&|$)/.test(content.location.search) ||
+		/(\/photos_stream(?!\?tab=photos_albums).*)/.test(content.location) || 
+		/^\/[A-Za-z0-9.]+\/photos(_all)?$/.test(content.location.pathname) || 
+		/(\?|&)sk=photos_stream(&|$)/.test(content.location.search) || 
 		/(\?|&)collection_token=.*5$/.test(content.location.search)
 	)
 		return 'user_photos';
+	// is this needed? not working if it's default as /photos, goes as 'photos by'
+	// it only works if the user is actively accessing the tab (of, by, albums)
 	if (
-		/^\/[A-Za-z0-9.]+\/photos$/.test(content.location.pathname) ||
-		/(\?|&)sk=photos(&|$)/.test(content.location.search) ||
+		/^\/[A-Za-z0-9.]+\/photos(_of)?$/.test(content.location.pathname) || 
+		/(\?|&)sk=photos(&|$)/.test(content.location.search) || 
 		/(\?|&)collection_token=.*4$/.test(content.location.search)
 	)
 		return 'user_photos_of';
